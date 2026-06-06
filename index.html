@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0a0e' rx='12'/%3E%3Cpath d='M0 12 Q0 0 12 0 L52 0 Q64 0 64 12 L64 52 Q64 64 52 64 L12 64 Q0 64 0 52 Z' fill='none' stroke='%23ff6a00' stroke-width='2'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-family='Courier New, monospace' font-weight='800' font-size='38' fill='%23ff8c42' letter-spacing='-1'%3ECF%3C/text%3E%3C/svg%3E">
+    <title>Cover Forge</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+    <div class="brand">
+        <h1><span class="accent">R</span><span class="light">EGENT'S</span> <span class="accent">V</span><span class="light">OICE</span> <span class="small">// COVER FORGE</span></h1>
+    </div>
+
+    <div class="workspace">
+        <div class="settings">
+            <div class="ctrl-group">
+                <div class="group-title">ОСНОВНЫЕ</div>
+                <label>ТЕКСТ НА ОБЛОЖКЕ</label>
+                <input type="text" id="titleInput" value="ПРИМЕР ТЕКСТА" placeholder="введите текст...">
+                <label>ФОНОВОЕ ИЗОБРАЖЕНИЕ</label>
+                <div id="dropZone" class="dropzone">
+                    ПЕРЕТАЩИТЕ ИЗОБРАЖЕНИЕ В ЛЮБОЕ МЕСТО
+                    <span class="hint">или нажмите здесь для загрузки</span>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                </div>
+                <label>ФОРМАТ</label>
+                <div class="type-group">
+                    <div data-type="cover" class="type-btn active">16:9</div>
+                    <div data-type="poster" class="type-btn">2:3</div>
+                    <div data-type="custom" class="type-btn">CUSTOM</div>
+                </div>
+                <div id="customBlock" style="display: none;">
+                    <div class="row-flex" style="margin-top: 8px;">
+                        <input type="number" id="customW" placeholder="ширина" value="16" step="1" min="1" style="width:45%">
+                        <span style="color:#ffaa77; font-weight: bold;">:</span>
+                        <input type="number" id="customH" placeholder="высота" value="9" step="1" min="1" style="width:45%">
+                    </div>
+                </div>
+            </div>
+
+            <div class="ctrl-group">
+                <div class="group-title">ТИПОГРАФИКА</div>
+                <div class="row-flex">
+                    <div style="flex:1"><label>ШРИФТ</label><select id="fontSelect"><option value="Courier New, monospace" selected>Courier New</option><option value="Menlo, Monaco, monospace">Menlo</option><option value="Georgia, serif">Georgia</option><option value="Arial, sans-serif">Arial</option></select></div>
+                    <div style="flex:1"><label>НАСЫЩЕННОСТЬ</label><select id="weightSelect"><option>400</option><option selected>700</option><option>800</option></select></div>
+                </div>
+                <div class="row-flex">
+                    <div style="flex:1"><label>ЦВЕТ</label><input type="color" id="textColor" value="#ffffff" style="height: 48px;"></div>
+                    <div style="flex:1"><label>РАЗМЕР (px)</label><div class="range-row"><input type="range" id="fontSizeRange" min="28" max="210" value="84" step="1"><span id="sizeValue" class="value-badge">84px</span></div></div>
+                </div>
+                <div class="row-flex">
+                    <div style="flex:1"><label>ВЫРАВНИВАНИЕ</label><select id="textAlignSelect"><option value="left">ЛЕВО</option><option value="center" selected>ЦЕНТР</option><option value="right">ПРАВО</option></select></div>
+                    <div style="flex:1"><label>ВЕРТИКАЛЬ</label><select id="textBaselineSelect"><option value="top">ВЕРХ</option><option value="middle" selected>СЕРЕДИНА</option><option value="bottom">НИЗ</option></select></div>
+                </div>
+                <label>ОТСТУП ОТ КРАЯ (%)</label>
+                <div class="range-row">
+                    <input type="range" id="paddingRange" min="0" max="14" step="0.5" value="5">
+                    <span id="padValue" class="value-badge">5%</span>
+                </div>
+            </div>
+
+            <div class="ctrl-group">
+                <div class="group-title">ЗАТЕМНЕНИЕ ФОНА</div>
+                <div class="row-flex">
+                    <div style="flex:1"><label>ЦВЕТ</label><input type="color" id="dimColor" value="#000000" style="height: 48px;"></div>
+                    <div style="flex:1"><label>ИНТЕНСИВНОСТЬ</label><input type="range" id="dimOpacity" min="0" max="1" step="0.01" value="0.38"></div>
+                </div>
+            </div>
+
+            <button id="downloadBtn" class="btn-download">ЭКСПОРТ В PNG</button>
+        </div>
+
+        <div class="preview">
+            <div class="canvas-wrap">
+                <canvas id="coverCanvas" width="960" height="540"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="exportModal" style="display: none; position: fixed; inset:0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity:0; transition:0.2s;" onclick="if(event.target===this) closeModal()">
+    <div style="background: #11131e; border: 1px solid #ff8c42; border-radius: 32px; padding: 1.8rem; width: 90%; max-width: 400px;">
+        <h3 style="color:#ffae70; margin-bottom: 1.2rem; font-size:1.2rem;">ПАРАМЕТРЫ ЭКСПОРТА</h3>
+        <label>ШИРИНА (px)</label>
+        <input type="number" id="exportW" value="1920" step="10" style="margin-bottom: 14px;">
+        <label>ВЫСОТА (px)</label>
+        <input type="number" id="exportH" value="1080" step="10" style="margin-bottom: 14px;">
+        <label>МАСШТАБ (x)</label>
+        <input type="number" id="exportScale" value="2" step="0.1" min="0.5" style="margin-bottom: 24px;">
+        <div style="display: flex; gap: 14px;">
+            <button id="confirmExport" style="flex:1; background:#ff6a00; border:none; padding: 10px; border-radius: 40px; color:black; font-weight: bold; font-size:0.9rem; cursor:pointer;">СОЗДАТЬ</button>
+            <button id="cancelModal" style="flex:1; background:#252a36; border:none; color:#eef; border-radius: 40px; font-size:0.9rem; cursor:pointer;">ОТМЕНА</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
