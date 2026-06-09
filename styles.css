@@ -39,10 +39,10 @@ body::before {
     padding-bottom: 0.5rem;
 }
 .brand h1 {
+    font-family: 'Times New Roman', Georgia, serif;
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 900;
     letter-spacing: 2px;
-    font-family: 'Courier New', monospace;
 }
 .brand .accent { color: #ff6a00; }
 .brand .light { color: #ccd6f0; }
